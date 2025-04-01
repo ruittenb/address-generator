@@ -11,10 +11,16 @@ use strict;
 use POSIX qw(floor);
 use Getopt::Std;
 
+use constant HALF    => .5;
+use constant THIRD   => .333;
+
 my %opts;
 
 ############################################################################
 # constants
+
+# --------------------------------------------------------------------------
+# cities
 
 my @CITY_UNIFIXES = qw(Barf Burp Drummel Gonsp Hark Jurk Kimmel Korst Nisk Pik Put Rinsp Smirk);
 
@@ -36,7 +42,8 @@ my @CITY_SUFFIXES = qw(
 
 my @CITY_EMBELLISHMENTS = qw(Noord Zuid Oost West Oud Nieuw Hoog Laag Groot Klein);
 
-my @RIVERS = qw(A Bummel Donkel Kreek Loens);
+# --------------------------------------------------------------------------
+# streets
 
 my @STREET_PREFIXES = (
     qw(Molen Kerk Stations Klooster Hoofd Ring Wijngaard), # city features
@@ -63,6 +70,27 @@ my @STREET_SUFFIXES = qw(
 
 my @HOUSENUMBER_SUFFIXES = qw(-hs -I -II -III bis A B C D); # ZW RD
 
+# --------------------------------------------------------------------------
+# rivers
+
+my @RIVER_UNIFIXES = qw(A Bummel Donkel Kreek Loens Schorrel Smelter Veender Wispel);
+
+
+my @RIVER_PREFIXES = qw(
+    Beneden Bos Boven Bronk Dieper Donker Eenden Egel Grens Groen Koud Kraaien
+    Linde Moer Neder Noorder Ooster Molen Vlier Vos Wester Wilgen Zander Zilver
+    Zuider Zwane
+);
+
+my @RIVER_SUFFIXES = qw(
+    beek beke dam diep geul gracht grave loop meer monde reede stroom sloot
+    vaart water wetering
+);
+
+my @RIVER_EMBELLISHMENTS = qw(
+    Brede Diepe Korte Kromme Lange Nieuwe Oude Smalle Witte
+);
+
 ############################################################################
 # functions
 
@@ -85,14 +113,27 @@ sub postcode {
     return floor(rand(9000) + 1000) . " " . chr(65 + rand 26) . chr(65 + rand 26);
 }
 
+sub river {
+    if (rand() < .3) {
+        return pick(@RIVER_UNIFIXES);
+        # 30 %
+    } elsif (rand() < HALF) {
+        # 35 %
+        return pick(@RIVER_EMBELLISHMENTS) . ' ' . pick(@RIVER_UNIFIXES);
+    } else {
+        # 35 %
+        return pick(@RIVER_PREFIXES) . pick(@RIVER_SUFFIXES);
+    }
+}
+
 sub city {
     if (rand() < .85) {
         # 85 %
         return pick(@CITY_PREFIXES) . pick(@CITY_SUFFIXES);
-    } elsif (rand() < .333) {
+    } elsif (rand() < THIRD) {
         # 5 %
-        return pick(@CITY_UNIFIXES) . ' aan de ' . pick(@RIVERS);
-    } elsif (rand() < .5) {
+        return pick(@CITY_UNIFIXES) . ' aan de ' . river();
+    } elsif (rand() < HALF) {
         # 5 %
         return pick(@CITY_PREFIXES) . pick(@CITY_SUFFIXES) . '-' . pick(@CITY_EMBELLISHMENTS);
     } else {
@@ -103,34 +144,34 @@ sub city {
 
 sub output {
     if ($opts{c}) {
-        say city;
+        say city();
     } elsif ($opts{s}) {
-        say street;
+        say street();
+    } elsif ($opts{r}) {
+        say river();
     } else {
-        say street, " ", housenumber;
-        say postcode, " ", city;
+        say street(), " ", housenumber();
+        say postcode(), " ", city();
     }
 }
 
 sub main {
     my ($count) = @_;
     for (1 .. $count // 1) {
-        output;
+        output();
     }
 }
 
 ############################################################################
 # main
 
-getopts('cs', \%opts); 
+getopts('crs', \%opts); 
 main @ARGV;
 
 __END__
 
 ##########################################################################
-# pod documentation
-
-# section 6
+# pod documentation: section 6
 
 =pod {{{
 
@@ -140,7 +181,7 @@ B<adres> - Generate Humorous Dutch Addresses
 
 =head1 SYNOPSIS
 
-B<adres> [ B<-c> ] [ B<-s> ] [ I<count> ]
+B<adres> [ B<-c> ] [ B<-r> ] [ B<-s> ] [ I<count> ]
 
 =head1 DESCRIPTION
 
@@ -157,11 +198,15 @@ By default, a full address is generated, with house number and postal code.
 
 =item B<-c>
 
-Generate a city name only. Note: B<-c> takes precedence over B<-s>.
+Generate a city name only. Note: B<-c> takes precedence over B<-s> and B<-r>.
+
+=item B<-r>
+
+Generate a river name only.
 
 =item B<-s>
 
-Generate a street name only.
+Generate a street name only. Note: B<-s> takes precedence over B<-r>.
 
 =back
 

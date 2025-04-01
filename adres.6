@@ -55,7 +55,7 @@
 .\" ========================================================================
 .\"
 .IX Title "ADRES 6"
-.TH ADRES 6 2025-03-31 "perl v5.30.3" "User Contributed Perl Documentation"
+.TH ADRES 6 2025-04-01 "perl v5.30.3" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -64,7 +64,7 @@
 adres \- Generate Humorous Dutch Addresses
 .SH SYNOPSIS
 .IX Header "SYNOPSIS"
-\&\fBadres\fR [ \fB\-c\fR ] [ \fB\-s\fR ] [ \fIcount\fR ]
+\&\fBadres\fR [ \fB\-c\fR ] [ \fB\-r\fR ] [ \fB\-s\fR ] [ \fIcount\fR ]
 .SH DESCRIPTION
 .IX Header "DESCRIPTION"
 This program generates funny Dutch postal addresses.
@@ -77,7 +77,10 @@ By default, a full address is generated, with house number and postal code.
 .IX Header "OPTIONS"
 .IP \fB\-c\fR 4
 .IX Item "-c"
-Generate a city name only. Note: \fB\-c\fR takes precedence over \fB\-s\fR.
+Generate a city name only. Note: \fB\-c\fR takes precedence over \fB\-s\fR and \fB\-r\fR.
+.IP \fB\-r\fR 4
+.IX Item "-r"
+Generate a river name only.
 .IP \fB\-s\fR 4
 .IX Item "-s"
-Generate a street name only.
+Generate a street name only. Note: \fB\-s\fR takes precedence over \fB\-r\fR.
